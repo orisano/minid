@@ -1,7 +1,9 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -11,7 +13,7 @@ import (
 func compress(nodes []*parser.Node) [][]*parser.Node {
 	var compressed [][]*parser.Node
 	for _, node := range nodes {
-		n := len(compressed)-1
+		n := len(compressed) - 1
 		if n >= 0 && compressed[n][0].Value == node.Value {
 			compressed[n] = append(compressed[n], node)
 		} else {
@@ -22,7 +24,23 @@ func compress(nodes []*parser.Node) [][]*parser.Node {
 }
 
 func main() {
-	result, err := parser.Parse(os.Stdin)
+	var dockerfilePath string
+	flag.StringVar(&dockerfilePath, "f", "Dockerfile", "Dockerfile's path")
+	flag.Parse()
+
+	var r io.Reader
+	if dockerfilePath == "-" {
+		r = os.Stdin
+	} else {
+		f, err := os.Open(dockerfilePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+		r = f
+	}
+
+	result, err := parser.Parse(r)
 	if err != nil {
 		log.Fatal(err)
 	}
