@@ -53,12 +53,12 @@ func main() {
 			}
 			fmt.Println()
 		case "env":
-			fmt.Print("ENV ")
+			fmt.Print("ENV")
 			for _, node := range nodes {
 				for n := node.Next; n != nil; n = n.Next.Next {
 					key := n.Value
 					val := n.Next.Value
-					fmt.Print(key, "=", val, " ")
+					fmt.Print(" ", key, "=", val)
 				}
 			}
 			fmt.Println()
