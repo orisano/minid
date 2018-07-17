@@ -33,17 +33,6 @@ RUN go build -i ./vendor/...
 
 COPY . .
 RUN make build
-
-FROM build as test
-ARG TZ=GMT0
-RUN cp /usr/share/zoneinfo/${TZ} /etc/localtime
-RUN make test
-
-FROM alpine:3.8
-RUN apk add --no-cache ca-certificates
-COPY --from=test /etc/mime.types /etc/localtime /etc/
-COPY --from=build /go/src/github.com/orisano/gobase/bin/name /bin/
-ENTRYPOINT ["/bin/name"]
 ```
 ```bash
 $ minid
@@ -57,14 +46,6 @@ ENV CGO_ENABLED=0 GO_LDFLAGS="-extldflags='-static'"
 RUN go build -i ./vendor/...
 COPY . .
 RUN make build
-FROM build as test
-ARG TZ=GMT0
-RUN cp /usr/share/zoneinfo/${TZ} /etc/localtime; make test
-FROM alpine:3.8
-RUN apk add --no-cache ca-certificates
-COPY --from=test /etc/mime.types /etc/localtime /etc/
-COPY --from=build /go/src/github.com/orisano/gobase/bin/name /bin/
-ENTRYPOINT ["/bin/name"]
 ```
 ```bash
 $ minid | docker build -f - .
