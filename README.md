@@ -13,7 +13,7 @@ go get -u github.com/orisano/minid
 
 ## How to use
 ```bash
-$ cat Dockerfile
+$ cat Dockerfile # 8 layers
 FROM golang:1.10-alpine3.8 AS build
 
 ENV DEP_VERSION 0.4.1
@@ -35,7 +35,7 @@ COPY . .
 RUN make build
 ```
 ```bash
-$ minid
+$ minid # 6 layers
 FROM golang:1.10-alpine3.8 AS build
 ENV DEP_VERSION=0.4.1
 WORKDIR /go/src/github.com/orisano/gobase
