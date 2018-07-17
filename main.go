@@ -49,7 +49,7 @@ func main() {
 		case "run":
 			fmt.Print(nodes[0].Original)
 			for _, node := range nodes[1:] {
-				fmt.Print("; ", node.Next.Value)
+				fmt.Print(" && ", node.Next.Value)
 			}
 			fmt.Println()
 		case "env":
