@@ -44,7 +44,8 @@ RUN apk add --no-cache ca-certificates
 COPY --from=test /etc/mime.types /etc/localtime /etc/
 COPY --from=build /go/src/github.com/orisano/gobase/bin/name /bin/
 ENTRYPOINT ["/bin/name"]
-
+```
+```bash
 $ minid
 FROM golang:1.10-alpine3.8 AS build
 ENV DEP_VERSION=0.4.1
@@ -64,7 +65,8 @@ RUN apk add --no-cache ca-certificates
 COPY --from=test /etc/mime.types /etc/localtime /etc/
 COPY --from=build /go/src/github.com/orisano/gobase/bin/name /bin/
 ENTRYPOINT ["/bin/name"]
-
+```
+```bash
 $ minid | docker build -f - .
 ```
 
