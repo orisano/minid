@@ -1,5 +1,5 @@
 # minid
-minid is Dockerfile minifier.
+minid is Dockerfile minifier for reducing the number of layers.
 
 ## Features
 * concatenate RUN command
