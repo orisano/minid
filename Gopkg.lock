@@ -8,7 +8,7 @@
     "frontend/dockerfile/command",
     "frontend/dockerfile/parser"
   ]
-  revision = "3ad5510cd2645b0245bc57537f9323cb24e77b63"
+  revision = "198465299c356ce92ff78a22a02fbd770ce32772"
 
 [[projects]]
   name = "github.com/pkg/errors"
