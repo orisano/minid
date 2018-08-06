@@ -3,22 +3,26 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:bc8d2c3338ff1001e4c5af3c626c14986615e6e1e617c2a4dda27432fde93465"
   name = "github.com/moby/buildkit"
   packages = [
     "frontend/dockerfile/command",
-    "frontend/dockerfile/parser"
+    "frontend/dockerfile/parser",
   ]
-  revision = "198465299c356ce92ff78a22a02fbd770ce32772"
+  pruneopts = "UT"
+  revision = "7e98ece83d11e4a5eeeedb212a945c0de5756379"
 
 [[projects]]
+  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
   name = "github.com/pkg/errors"
   packages = ["."]
+  pruneopts = "UT"
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "165e1f33d1cc29471be6f00263fef5a8ea10b0b2587fd79b00b38befd5245a9c"
+  input-imports = ["github.com/moby/buildkit/frontend/dockerfile/parser"]
   solver-name = "gps-cdcl"
   solver-version = 1
