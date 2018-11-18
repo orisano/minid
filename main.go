@@ -51,6 +51,7 @@ func isSameDestination(a, b *parser.Node) bool {
 func main() {
 	var dockerfilePath string
 	flag.StringVar(&dockerfilePath, "f", "Dockerfile", "Dockerfile's path")
+	outputPath := flag.String("o", "-", "generated Dockerfile path")
 	flag.Parse()
 
 	var r io.Reader
@@ -64,6 +65,18 @@ func main() {
 		defer f.Close()
 		r = f
 	}
+	var w io.Writer
+	if *outputPath == "-" {
+		w = os.Stdout
+	} else {
+		f, err := os.Create(*outputPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+		w = f
+	}
+
 
 	result, err := parser.Parse(r)
 	if err != nil {
@@ -72,37 +85,37 @@ func main() {
 	for _, nodes := range compressBy(result.AST.Children, isSameCommand) {
 		switch cmd := strings.ToUpper(nodes[0].Value); cmd {
 		case "RUN":
-			fmt.Print(nodes[0].Original)
+			fmt.Fprint(w, nodes[0].Original)
 			for _, node := range nodes[1:] {
-				fmt.Print(" && ", node.Next.Value)
+				fmt.Fprint(w, " && ", node.Next.Value)
 			}
-			fmt.Println()
+			fmt.Fprintln(w)
 		case "ENV":
-			fmt.Print(cmd)
+			fmt.Fprint(w, cmd)
 			for _, node := range nodes {
 				for n := node.Next; n != nil; n = n.Next.Next {
 					key := n.Value
 					val := n.Next.Value
-					fmt.Print(" ", key, "=", val)
+					fmt.Fprint(w, " ", key, "=", val)
 				}
 			}
-			fmt.Println()
+			fmt.Fprintln(w)
 		case "ADD", "COPY":
 			for _, xs := range compressBy(nodes, isSameDestination) {
-				fmt.Print(cmd)
+				fmt.Fprint(w, cmd)
 				if len(xs[0].Flags) > 0 {
-					fmt.Print(" ", strings.Join(xs[0].Flags, " "))
+					fmt.Fprint(w, " ", strings.Join(xs[0].Flags, " "))
 				}
 				for _, x := range xs {
 					for n := x.Next; n.Next != nil; n = n.Next {
-						fmt.Print(" ", n.Value)
+						fmt.Fprint(w, " ", n.Value)
 					}
 				}
-				fmt.Println(" ", destination(xs[0]))
+				fmt.Fprintln(w, " ", destination(xs[0]))
 			}
 		default:
 			for _, node := range nodes {
-				fmt.Println(node.Original)
+				fmt.Fprintln(w, node.Original)
 			}
 		}
 	}
