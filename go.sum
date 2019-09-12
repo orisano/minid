@@ -1,0 +1,4 @@
+github.com/moby/buildkit v0.0.0-20180803201552-7e98ece83d11 h1:ED2TwOEJqpybgAupCtm8aYOUhMjNi5jGaiQN7PIPjjg=
+github.com/moby/buildkit v0.0.0-20180803201552-7e98ece83d11/go.mod h1:nnELdKPRkUAQR6pAB3mRU3+IlbqL3SSaAWqQL8k/K+4=
+github.com/pkg/errors v0.8.0 h1:WdK/asTD0HN+q6hsWO3/vpuAkAr+tw6aNJNDFFf0+qw=
+github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
