@@ -7,9 +7,14 @@ import (
 	"log"
 	"os"
 	"strings"
+	"unicode"
 
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
 )
+
+type entry struct {
+	key, value string
+}
 
 func compressBy(nodes []*parser.Node, pred func(a, b *parser.Node) bool) [][]*parser.Node {
 	var compressed [][]*parser.Node
@@ -77,7 +82,6 @@ func main() {
 		w = f
 	}
 
-
 	result, err := parser.Parse(r)
 	if err != nil {
 		log.Fatal(err)
@@ -91,15 +95,29 @@ func main() {
 			}
 			fmt.Fprintln(w)
 		case "ENV":
-			fmt.Fprint(w, cmd)
+			var entries []entry
 			for _, node := range nodes {
 				for n := node.Next; n != nil; n = n.Next.Next {
 					key := n.Value
 					val := n.Next.Value
-					fmt.Fprint(w, " ", key, "=", val)
+					entries = append(entries, entry{key: key, value: val})
 				}
 			}
-			fmt.Fprintln(w)
+
+			for len(entries) > 0 {
+				fmt.Fprint(w, cmd)
+				vars := map[string]bool{}
+				for len(entries) > 0 {
+					e := entries[0]
+					if hasReference(vars, e.value) {
+						break
+					}
+					vars[e.key] = true
+					fmt.Fprint(w, " ", e.key, "=", e.value)
+					entries = entries[1:]
+				}
+				fmt.Fprintln(w)
+			}
 		case "ADD", "COPY":
 			for _, xs := range compressBy(nodes, isSameDestination) {
 				fmt.Fprint(w, cmd)
@@ -119,4 +137,33 @@ func main() {
 			}
 		}
 	}
+}
+
+func hasReference(vars map[string]bool, expr string) bool {
+	if !strings.ContainsRune(expr, '$') {
+		return false
+	}
+	for v := range vars {
+		if strings.Contains(expr, "${"+v+"}") {
+			return true
+		}
+		if strings.Contains(expr, "${"+v+":") {
+			return true
+		}
+		tokens := strings.Split(expr, "$"+v)
+		if len(tokens) == 1 {
+			continue
+		}
+		for i := 1; i < len(tokens); i++ {
+			rs := []rune(tokens[i])
+			if len(rs) == 0 {
+				return true
+			}
+			r := rs[0]
+			if !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '_' {
+				return true
+			}
+		}
+	}
+	return false
 }
