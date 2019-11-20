@@ -118,6 +118,16 @@ func main() {
 				}
 				fmt.Fprintln(w)
 			}
+		case "LABEL":
+			fmt.Fprint(w, cmd)
+			for _, node := range nodes {
+				for n := node.Next; n != nil; n = n.Next.Next {
+					key := n.Value
+					val := n.Next.Value
+					fmt.Fprint(w, " ", key, "=", val)
+				}
+			}
+			fmt.Fprintln(w)
 		case "ADD", "COPY":
 			for _, xs := range compressBy(nodes, isSameDestination) {
 				fmt.Fprint(w, cmd)
