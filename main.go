@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -82,9 +85,21 @@ func main() {
 		w = f
 	}
 
-	result, err := parser.Parse(r)
+	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	head, _, err := bufio.NewReader(bytes.NewReader(b)).ReadLine()
+	if err != nil {
+		log.Fatal(err)
+	}
+	result, err := parser.Parse(bytes.NewReader(b))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if bytes.HasPrefix(head, []byte("# syntax =")) {
+		fmt.Fprintln(w, string(head))
 	}
 	for _, nodes := range compressBy(result.AST.Children, isSameCommand) {
 		switch cmd := strings.ToUpper(nodes[0].Value); cmd {
