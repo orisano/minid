@@ -1,4 +1,7 @@
 # minid
+
+[![Build Status](https://github.com/orisano/minid/workflows/test/badge.svg)](https://github.com/orisano/minid/actions?query=workflow%3Atest)
+
 minid is Dockerfile minifier for reducing the number of layers.
 
 ## Features
