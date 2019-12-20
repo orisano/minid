@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"strings"
 	"unicode"
 
@@ -44,14 +45,29 @@ func run() error {
 		return xerrors.Errorf("read Dockerfile: %w", err)
 	}
 
-	wc, err := openWriter(flags.outputPath)
-	if err != nil {
-		return xerrors.Errorf("open Dockerfile writer: %w", err)
-	}
-	defer wc.Close()
+	args := flag.Args()
 
-	if err := writeMinifiedDockerfile(wc, dockerfile); err != nil {
-		return xerrors.Errorf("minify: %w", err)
+	if len(args) >= 1 && args[0] == "build" {
+		var buf bytes.Buffer
+		if err := writeMinifiedDockerfile(&buf, dockerfile); err != nil {
+			return xerrors.Errorf("minify: %w", err)
+		}
+		cmd := exec.Command("docker", append([]string{"build", "-f", "-"}, args[1:]...)...)
+		cmd.Stdin = &buf
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
+		if err := cmd.Run(); err != nil {
+			return xerrors.Errorf("exec docker build: %w", err)
+		}
+	} else {
+		wc, err := openWriter(flags.outputPath)
+		if err != nil {
+			return xerrors.Errorf("open Dockerfile writer: %w", err)
+		}
+		defer wc.Close()
+		if err := writeMinifiedDockerfile(wc, dockerfile); err != nil {
+			return xerrors.Errorf("minify: %w", err)
+		}
 	}
 
 	return nil
