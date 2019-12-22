@@ -55,6 +55,12 @@ RUN make build
 ```bash
 $ minid | docker build -f - .
 ```
+ 
+ or
+ 
+ ```bash
+ $ minid build .
+ ```
 
 ## Author
 Nao YONASHIRO (@orisano)
