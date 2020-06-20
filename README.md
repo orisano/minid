@@ -63,7 +63,7 @@ $ minid | docker build -f - .
  ```
 
 ## Author
-Nao YONASHIRO (@orisano)
+Nao Yonashiro (@orisano)
 
 ## License
 MIT
