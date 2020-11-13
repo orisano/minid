@@ -14,7 +14,6 @@ import (
 	"unicode"
 
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
-	"golang.org/x/xerrors"
 )
 
 func main() {
@@ -42,7 +41,7 @@ func run() error {
 
 	dockerfile, err := readDockerfile(flags.dockerfilePath)
 	if err != nil {
-		return xerrors.Errorf("read Dockerfile: %w", err)
+		return fmt.Errorf("read Dockerfile: %w", err)
 	}
 
 	args := flag.Args()
@@ -50,23 +49,23 @@ func run() error {
 	if len(args) >= 1 && args[0] == "build" {
 		var buf bytes.Buffer
 		if err := writeMinifiedDockerfile(&buf, dockerfile); err != nil {
-			return xerrors.Errorf("minify: %w", err)
+			return fmt.Errorf("minify: %w", err)
 		}
 		cmd := exec.Command("docker", append([]string{"build", "-f", "-"}, args[1:]...)...)
 		cmd.Stdin = &buf
 		cmd.Stderr = os.Stderr
 		cmd.Stdout = os.Stdout
 		if err := cmd.Run(); err != nil {
-			return xerrors.Errorf("exec docker build: %w", err)
+			return fmt.Errorf("exec docker build: %w", err)
 		}
 	} else {
 		wc, err := openWriter(flags.outputPath)
 		if err != nil {
-			return xerrors.Errorf("open Dockerfile writer: %w", err)
+			return fmt.Errorf("open Dockerfile writer: %w", err)
 		}
 		defer wc.Close()
 		if err := writeMinifiedDockerfile(wc, dockerfile); err != nil {
-			return xerrors.Errorf("minify: %w", err)
+			return fmt.Errorf("minify: %w", err)
 		}
 	}
 
@@ -90,7 +89,7 @@ func openWriter(name string) (io.WriteCloser, error) {
 func readDockerfile(dockerfilePath string) ([]byte, error) {
 	rc, err := openReader(dockerfilePath)
 	if err != nil {
-		return nil, xerrors.Errorf("open reader: %w", err)
+		return nil, fmt.Errorf("open reader: %w", err)
 	}
 	defer rc.Close()
 	return ioutil.ReadAll(rc)
@@ -99,12 +98,12 @@ func readDockerfile(dockerfilePath string) ([]byte, error) {
 func writeMinifiedDockerfile(w io.Writer, dockerfile []byte) error {
 	head, _, err := bufio.NewReader(bytes.NewReader(dockerfile)).ReadLine()
 	if err != nil {
-		return xerrors.Errorf("head Dockerfile: %w", err)
+		return fmt.Errorf("head Dockerfile: %w", err)
 	}
 
 	result, err := parser.Parse(bytes.NewReader(dockerfile))
 	if err != nil {
-		return xerrors.Errorf("parse: %w", err)
+		return fmt.Errorf("parse: %w", err)
 	}
 
 	bw := bufio.NewWriter(w)
