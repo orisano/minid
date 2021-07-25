@@ -196,7 +196,7 @@ func isSameCommand(a, b *parser.Node) bool {
 }
 
 func destination(n *parser.Node) string {
-	switch n.Value {
+	switch strings.ToLower(n.Value) {
 	case "add", "copy":
 		x := n.Next
 		for x.Next != nil {
