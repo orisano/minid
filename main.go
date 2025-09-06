@@ -121,7 +121,7 @@ func writeMinifiedDockerfile(w io.Writer, dockerfile []byte) error {
 		case "ENV":
 			var entries []envEntry
 			for _, node := range nodes {
-				for n := node.Next; n != nil; n = n.Next.Next {
+				for n := node.Next; n != nil && n.Next != nil; n = n.Next.Next {
 					key := n.Value
 					val := n.Next.Value
 					entries = append(entries, envEntry{key: key, value: val})
@@ -145,7 +145,7 @@ func writeMinifiedDockerfile(w io.Writer, dockerfile []byte) error {
 		case "LABEL":
 			fmt.Fprint(bw, cmd)
 			for _, node := range nodes {
-				for n := node.Next; n != nil; n = n.Next.Next {
+				for n := node.Next; n != nil && n.Next != nil; n = n.Next.Next {
 					key := n.Value
 					val := n.Next.Value
 					fmt.Fprint(bw, " ", key, "=", val)
